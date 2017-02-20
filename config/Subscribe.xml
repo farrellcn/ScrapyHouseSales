@@ -1,0 +1,9 @@
+<?xml version="1.0"?><!DOCTYPE Root []>
+<Root>
+	<Subscribe Name="LowFloor">
+		<Receiver>314003985@qq.com</Receiver>
+		<Condtions>
+			<Condition FieldName="floor" DataType="_INT" Type="ctBetween" Value="0-3"/>
+		</Condtions>		
+	</Subscribe>	
+</Root>

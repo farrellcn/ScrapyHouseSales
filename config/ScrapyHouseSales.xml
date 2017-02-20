@@ -1,0 +1,96 @@
+<?xml version="1.0"?><!DOCTYPE Root []>
+<Root>
+	<Source Name="58">
+		<PageList>
+			<Charset>utf-8</Charset>
+			<BaseUrl>http://la.58.com/shouxian/ershoufang/pn1</BaseUrl>
+			<NextPage>http://la.58.com/shouxian/ershoufang/pn(\d+)</NextPage>
+			<SearchDeep>2</SearchDeep>
+			<MaxDeep>8</MaxDeep>
+			<Regex>(&lt;p class="bthead"&gt;[\S\s]*?&lt;a href="([\S\s]*?ershoufang/([\S\s]*?)x.shtml[\S\s]+?)"[\S\s]+?&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?&lt;/span&gt;[\S\s]*?class="a_xq1"&gt;[\s]*?([\S\s]*?)&lt;/a&gt;[\s]*?- (&lt;a[\S\s]*?&gt;|[\s]*?)([\S\s]{0,100}?)(&lt;/a&gt;|[\s]*?)[\s]*?&lt;i class="clear"&gt;&lt;/i&gt;[\S\s]*?(&lt;span class="label_fang g_tagSon\d"&gt;([\S\s]*?)&lt;/span&gt;[\S\s]*?)+&lt;span class="label_fang tubaAdd"[\S\s]*?&lt;span class="qj-listjjr"&gt;[\S\s]*?&lt;label&gt;([\S\s]*?)&lt;/label&gt;(([\S\s]{0,100}&lt;a[\S\s]*?&gt;[\S\s]*?：([\S\s]*?)&lt;/a&gt;[\S\s]*?|[\S\s]{0,100})&amp;nbsp;([\S\s]*?)&lt;/span&gt;|[\S\s]*?)[\S\s]*?&lt;/div&gt;[\S\s]*?&lt;b class='pri'&gt;[\s]*?([\S]*?)[\s]*?&lt;/b&gt;[\s]*?([\S]+?)[\S\s]*?[\S]*;[\S\s]*?([\S]+?)[\s]*?&lt;br/&gt;[\S\s]*?&lt;span class="showroom"&gt;[\s]*?([\S]*?)[\s]*?&lt;/span&gt;[\s]*?\(([\S]*?)\)[\s]*?&lt;br/&gt;)</Regex>
+			<DataFields>
+				<Field Name="link" DataType="_STRING" MatchGroupIndex="1"/>
+				<Field Name="productID" DataType="_STRING" MatchGroupIndex="2"/>
+				<Field Name="title" DataType="_STRING" MatchGroupIndex="3"/>
+				<Field Name="location" DataType="_STRING" MatchGroupIndex="4"/>
+				<Field Name="community" DataType="_STRING" MatchGroupIndex="6"/>
+				<Field Name="tag" DataType="_STRING" MatchGroupIndex="9"/>
+				<Field Name="publisherType" DataType="_STRING" MatchGroupIndex="10"/>
+				<Field Name="publisherName" DataType="_STRING" MatchGroupIndex="13"/>
+				<Field Name="productUpdateTimeStr" DataType="_STRING" MatchGroupIndex="14"/>
+				<Field Name="price" DataType="_STRING" MatchGroupIndex="15"/>		
+				<Field Name="priceUnit" DataType="_STRING" MatchGroupIndex="16"/>
+				<Field Name="unitPrice" DataType="_STRING" MatchGroupIndex="17"/>
+				<Field Name="layout" DataType="_STRING" MatchGroupIndex="18"/>
+				<Field Name="square" DataType="_STRING" MatchGroupIndex="19"/>				
+			</DataFields>
+			<HtmlTemplate>&lt;p&gt;&lt;a href="$link$"&gt;$title$($source$)&lt;/a&gt;  $productUpdateTimeStr$&lt;br&gt;&lt;font color="red"&gt;$community$  $price$$priceUnit$($square$)&lt;/font&gt;&lt;br&gt;$unitPrice$  $layout$  $publisherType$  $publisherName$  $tag$&lt;/p&gt;</HtmlTemplate>
+			<SummaryTemplate>$productUpdateTime$-$productID$-$title$-$publisherName$-$source$-$square$-$publisherType$-$price$-$tag$-$layout$-$unitPrice$-$priceUnit$-$location$-$community$</SummaryTemplate>
+		</PageList>
+		<PageDetail>
+			<Regex></Regex>
+		</PageDetail>
+	</Source>
+	<Source Name="shoufc">
+		<PageList>
+			<Charset>gbk</Charset>
+			<BaseUrl>http://www.shoufc.cn/sale/page1.html</BaseUrl>
+			<NextPage>http://www.shoufc.cn/sale/page(\d+).html</NextPage>
+			<SearchDeep>2</SearchDeep>
+			<MaxDeep>50</MaxDeep>
+			<Regex>(&lt;ul class=ul[0|1]&gt;[\S\s]*?(\d)\.gif[\S\s]*?&lt;a href="([\S\s]*?)" target="_blank"&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?blank"&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?blank"&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?blank"&gt;([\S\s]*?)/([\S\s]*?)&lt;/a&gt;[\S\s]*?blank"&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?blank"&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?blank"&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?blank"&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?blank"&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?&lt;a href="/sale/(\d+?).html" target="_blank"&gt;([\S\s]*?)&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;)</Regex>
+			<DataFields>
+				<Field Name="pic" DataType="_STRING" MatchGroupIndex="1"/>
+				<Field Name="link" DataType="_STRING" MatchGroupIndex="2"/>
+				<Field Name="location" DataType="_STRING" MatchGroupIndex="3"/>
+				<Field Name="title" DataType="_STRING" MatchGroupIndex="4"/>
+				<Field Name="community" DataType="_STRING" MatchGroupIndex="4"/>
+				<Field Name="buildingType" DataType="_STRING" MatchGroupIndex="5"/>
+				<Field Name="floor" DataType="_STRING" MatchGroupIndex="6"/>
+				<Field Name="buildingFloors" DataType="_STRING" MatchGroupIndex="7"/>
+				<Field Name="layout" DataType="_STRING" MatchGroupIndex="8"/>
+				<Field Name="decoration" DataType="_STRING" MatchGroupIndex="9"/>
+				<Field Name="square" DataType="_STRING" MatchGroupIndex="10"/>
+				<Field Name="unitPrice" DataType="_STRING" MatchGroupIndex="11"/>
+				<Field Name="price" DataType="_STRING" MatchGroupIndex="12"/>
+				<Field Name="productUpdateTimeStr" DataType="_STRING" MatchGroupIndex="14"/>
+				<Field Name="productID" DataType="_STRING" MatchGroupIndex="13"/>
+			</DataFields>
+			<HtmlTemplate>&lt;p&gt;&lt;a href="http://www.shoufc.cn$link$"&gt;$title$  $buildingType$($source$)   $productUpdateTimeStr$&lt;/a&gt;&lt;br&gt;&lt;font color="red"&gt;$floor$/$buildingFloors$  $price$($square$)  $layout$&lt;/font&gt;&lt;br&gt;$decoration$  $unitPrice$/㎡&lt;/p&gt;</HtmlTemplate>
+			<SummaryTemplate>$productUpdateTime$-$productID$-$title$-$link$-$pic$-$unitPrice$-$community$-$price$-$decoration$-$layout$-$buildingType$-$floor$-$source$-$square$-$location$-$buildingFloors$</SummaryTemplate>
+		</PageList>
+		<PageDetail>
+			<Regex></Regex>
+		</PageDetail>			
+	</Source>
+	<Source Name="ganji">
+		<PageList>
+			<Charset>utf-8</Charset>
+			<BaseUrl>http://la.58.com/shouxian/ershoufang/pn1</BaseUrl>
+			<NextPage>http://la.58.com/shouxian/ershoufang/pn(\d+)</NextPage>
+			<SearchDeep>2</SearchDeep>
+			<MaxDeep>50</MaxDeep>
+			<Regex>&lt;p class="bthead"&gt;[\S\s]*?&lt;a href="([\S\s]*?)"[\S\s]+?&gt;([\S\s]*?)&lt;/a&gt;[\S\s]*?&lt;/span&gt;[\S\s]*?class="a_xq1"&gt;[\s]*?([\S]*?)[\s]*?&lt;/a&gt;[\s]*- ([\S\s]*?)[\s]*?&lt;i class="clear"&gt;&lt;/i&gt;[\S\s]*?(?:&lt;span class="label_fang g_tagSon\d"&gt;([\S\s]*?)&lt;/span&gt;[\S\s]*?)+&lt;span class="label_fang tubaAdd"[\S\s]*?&lt;span class="qj-listjjr"&gt;[\S\s]*?&lt;label&gt;([\S\s]*?)&lt;/label&gt;([\S\s]*?&lt;a[\S\s]*?&gt;：([\S\s]*?)&lt;/a&gt;[\S\s]*?&amp;nbsp;([\S]+)[\S\s]*?&lt;/span&gt;|[\S\s]*?)[\S\s]*?&lt;/div&gt;[\S\s]*?&lt;b class='pri'&gt;[\s]*?([\S]*?)[\s]*?&lt;/b&gt;[\s]*?([\S]+?)[\S\s]*?[\S]*;[\S\s]*?([\S]+?)[\s]*?&lt;br/&gt;[\S\s]*?&lt;span class="showroom"&gt;[\s]*?([\S]*?)[\s]*?&lt;/span&gt;[\s]*?\(([\S]*?)\)[\s]*?&lt;br/&gt;</Regex>
+			<DataFields>
+				<Field Name="link" DataType="_STRING" MatchGroupIndex="0"/>
+				<Field Name="title" DataType="_STRING" MatchGroupIndex="1"/>
+				<Field Name="location" DataType="_STRING" MatchGroupIndex="2"/>
+				<Field Name="community" DataType="_STRING" MatchGroupIndex="3"/>
+				<Field Name="tag" DataType="_STRING" MatchGroupIndex="4"/>
+				<Field Name="publisherType" DataType="_STRING" MatchGroupIndex="5"/>
+				<Field Name="publisherName" DataType="_STRING" MatchGroupIndex="7"/>
+				<Field Name="productUpdateTimeStr" DataType="_STRING" MatchGroupIndex="8"/>
+				<Field Name="price" DataType="_STRING" MatchGroupIndex="9"/>		
+				<Field Name="priceUnit" DataType="_STRING" MatchGroupIndex="10"/>
+				<Field Name="unitPrice" DataType="_STRING" MatchGroupIndex="11"/>
+				<Field Name="layout" DataType="_STRING" MatchGroupIndex="12"/>
+				<Field Name="square" DataType="_STRING" MatchGroupIndex="13"/>				
+			</DataFields>
+			<HtmlTemplate>&lt;p&gt;&lt;a href="$link$"&gt;$title$($source$)&lt;/a&gt;  $productUpdateTimeStr$&lt;br&gt;&lt;font color="red"&gt;$community$  $price$$priceUnit$($square$)&lt;/font&gt;&lt;br&gt;$unitPrice$  $layout$  $publisherType$  $publisherName$  $tag$&lt;/p&gt;</HtmlTemplate>
+			<SummaryTemplate>$link$</SummaryTemplate>
+		</PageList>
+		<PageDetail>
+			<Regex></Regex>
+		</PageDetail>
+	</Source>
+</Root>
