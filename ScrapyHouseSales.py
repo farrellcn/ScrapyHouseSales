@@ -281,28 +281,29 @@ class ScrapyHouseInfo():
 			print ('Scrapy: ' + self.currentPageUrl)
 			self.pageCount = self.pageCount + 1
 			pageContent = self.GetPageContent(self.currentPageUrl)
-			pageContent = pageContent.decode(self.pageList.charset)	
-			matchList = re.findall(self.pageList.regex, pageContent)
-			if len(matchList) < 1:
-				print ('该页面已无房源，搜索截止')
-				break
-			for match in matchList:
-				house = HouseInfo()
-				for field in self.pageList.fields:
-					house.data['source'] = self.source
-					house.data['guid'] = str(uuid.uuid1())
-					if field.matchGroupIndex < len(match):
-						house.data[field.name] = match[field.matchGroupIndex].strip()									
-				self.ProcessSpecField(house.data)
-				house.data['summaryText'] = self.GetSummaryText(house)
-				createTime = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
-				updatetime = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
-				house.data['createTime'] = createTime
-				house.data['updatetime'] = updatetime
-				if len(house.data['productID']) < 1:
-					house.data['productID'] = str(createTime)				
-				if self.IsNewly(house):					
-					self.houseList.append(house)
+			if len(pageContent) > 0:
+				pageContent = pageContent.decode(self.pageList.charset)	
+				matchList = re.findall(self.pageList.regex, pageContent)
+				if len(matchList) < 1:
+					print ('该页面已无房源，搜索截止')
+					break
+				for match in matchList:
+					house = HouseInfo()
+					for field in self.pageList.fields:
+						house.data['source'] = self.source
+						house.data['guid'] = str(uuid.uuid1())
+						if field.matchGroupIndex < len(match):
+							house.data[field.name] = match[field.matchGroupIndex].strip()									
+					self.ProcessSpecField(house.data)
+					house.data['summaryText'] = self.GetSummaryText(house)
+					createTime = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+					updatetime = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+					house.data['createTime'] = createTime
+					house.data['updatetime'] = updatetime
+					if len(house.data['productID']) < 1:
+						house.data['productID'] = str(createTime)				
+					if self.IsNewly(house):					
+						self.houseList.append(house)
 			self.currentPageUrl = self.GetNextPage()
 
 	def ProcessSpecField(self, dataDict):
@@ -318,7 +319,11 @@ class ScrapyHouseInfo():
 			return True
 
 	def GetPageContent(self, pageurl):
-		response = urllib.request.urlopen(pageurl)
+		try:
+			response = urllib.request.urlopen(pageurl)
+		except:
+			print ('无法获取该页面')
+			return ('')
 		return response.read()
 
 	def GetNextPage(self):

@@ -1,2 +1,3 @@
-"config/config.ini" 
-config/SuningConfig.ini 
+config/config.ini
+config/SuningConfig.ini
+__pycache__
