@@ -1,2 +1,2 @@
 cd %~dp0
-c:\python34\python.exe %~dp0\..\ScrapyHouseSales.py
+c:\python34\python %~dp0..\ScrapyHouseSales.py

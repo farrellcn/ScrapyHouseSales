@@ -11,6 +11,7 @@ import urllib.request, re, codecs, os, os.path, smtplib, configparser, time, sys
 XML_FILE_NAME = 'ScrapyHouseSales.xml'
 SOURCE_NODE_NAME = 'Source'
 
+PATH_CONFIG = 'config\\'
 CONFIG_FILE_NAME = 'config.ini'
 CONFIG_FIELD_EMAIL = 'email'
 CONFIG_FIELD_DATABASE = 'database'
@@ -22,7 +23,7 @@ LOG_FILE_NAME = 'log.txt'
 def ReadConfig(field, key):
     cf = configparser.ConfigParser()
     try:
-        cf.read(GetAbsPath() + CONFIG_FILE_NAME)
+        cf.read(GetConfigPath() + CONFIG_FILE_NAME)
         result = cf.get(field, key)
     except:
         sys.exit(1)
@@ -34,7 +35,7 @@ def WriteConfig(field, key, value):
     try:
         cf.read(CONFIG_FILE_NAME)
         cf.set(field, key, value)
-        cf.write(open(GetAbsPath() + CONFIG_FILE_NAME,'w'))
+        cf.write(open(GetConfigPath() + CONFIG_FILE_NAME,'w'))
     except:
         sys.exit(1)
     return True
@@ -49,14 +50,18 @@ def IsNum(str):
 def GetAbsPath():
 	'''
 	sys.argv为执行该python脚本时的命令行参数
-	sys.argv[0]为该python脚本的绝对路径
+	sys.argv[0]为该python脚本的路径
 	'''
-	if len(sys.argv[0]) < 1:
+	if len(os.path.dirname(sys.argv[0])) < 1:
 		return ''
-	return os.path.dirname(sys.argv[0]) + '\\'
+	else:
+		return os.path.dirname(sys.argv[0]) + '\\'
 
 def GetLogPath():
 	return GetAbsPath() + PATH_LOG
+
+def GetConfigPath():
+	return GetAbsPath() + PATH_CONFIG
 
 #将新发布的卖房信息添加到数据库
 def AddToDatabase(houseList):
@@ -214,7 +219,7 @@ class HtmlContent():
 class ScrapyHouseInfo():
 	#从配置文件加载爬取网站所需的信息
 	def LoadConfig(self):
-		dom = minidom.parse(GetAbsPath() + XML_FILE_NAME)
+		dom = minidom.parse(GetConfigPath() + XML_FILE_NAME)
 		root = dom.documentElement
 		sourceNodeList = root.getElementsByTagName(SOURCE_NODE_NAME)
 		for sourceNode in sourceNodeList:
