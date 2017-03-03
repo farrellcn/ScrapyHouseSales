@@ -19,6 +19,11 @@ CONFIG_FIELD_DATABASE = 'database'
 PATH_LOG = 'log/'
 LOG_FILE_NAME = 'log.txt'
 
+SCRAPY_CAUSE_NEW = 'New'
+SCRAPY_CAUSE_TimeUpdate = 'TimeUpdate'
+SCRAPY_CAUSE_PriceChange = 'PriceChange'
+SCRAPY_CAUSE_ContentChange = 'ContentChange'
+
 #读ini文件
 def ReadConfig(field, key):
     cf = configparser.ConfigParser()
@@ -52,9 +57,7 @@ def GetAbsPath():
 	'''
 	sys.argv为执行该python脚本时的命令行参数
 	sys.argv[0]为该python脚本的路径
-	'''
-	#return ('/root/GitHub/ScrapyHouseSales/')
-	#print (os.path.dirname('AbsPath=%s'%sys.argv[0]))
+	'''	
 	if len(os.path.dirname(sys.argv[0])) < 1:
 		return ''
 	else:
@@ -271,12 +274,17 @@ class ScrapyHouseInfo():
 			htmlObj.count = htmlObj.count + 1
 			houseStr = self.pageList.htmlTemplate
 			for key in house.data:
-				houseStr = houseStr.replace('$' + key + '$', house.data[key], 1)
+				if key == 'scrapyCause':
+					houseStr = houseStr.replace('$' + key + '$', causeDic[house.data[key]], 1)
+				else:
+					houseStr = houseStr.replace('$' + key + '$', house.data[key], 1)
 			htmlObj.html = htmlObj.html + houseStr
 		print ('html finished')
 		return htmlObj
 
 	def NeedNotify(self, house):
+		if house.data['scrapyCause'] == SCRAPY_CAUSE_TimeUpdate:
+			return False
 		return True
 
 	def GetSummaryText(self, house):
@@ -322,12 +330,26 @@ class ScrapyHouseInfo():
 	#是否有新添加的售房信息
 	def IsNewly(self, house):
 		#print (house.data['summaryText'])
-		sql = 'SELECT * FROM secondhand WHERE SummaryText="%s"' % house.data['summaryText']
-		row = db.Execute(sql)
+		row = db.Execute('SELECT * FROM secondhand WHERE SummaryText="%s" and ProductUpdateTime="%s"' % (house.data['summaryText'], house.data['productUpdateTime']))
 		if row > 0:
 			return False
-		else:
+		row = db.Execute('SELECT * FROM secondhand WHERE ProductID="%s" ORDER BY CreateTime DESC' % house.data['productID'])		
+		if row < 1:
+			house.data['scrapyCause'] = SCRAPY_CAUSE_NEW
+			return True	
+		records = db.GetLastRecords()
+		firshRecord = records[0]
+		if house.data['price'] != firshRecord['Price']:		
+			house.data['scrapyCause'] = SCRAPY_CAUSE_PriceChange
 			return True
+		if house.data['summaryText'] != firshRecord['SummaryText']:	
+			house.data['scrapyCause'] = SCRAPY_CAUSE_ContentChange
+			return True
+		if house.data['productUpdateTime'] != firshRecord['ProductUpdateTime']:	
+			house.data['scrapyCause'] = SCRAPY_CAUSE_TimeUpdate
+			return True
+		house.data['scrapyCause'] = SCRAPY_CAUSE_TimeUpdate
+		return True
 
 	def GetPageContent(self, pageurl):
 		try:
@@ -366,6 +388,8 @@ class Scrapy58(ScrapyHouseInfo):
 
 class ScrapyShouFC(ScrapyHouseInfo):
 	def NeedNotify(self, house):
+		if not ScrapyHouseInfo.NeedNotify(self, house):
+			return False
 		if IsNum(house.data['floor']):
 			if int(house.data['floor']) < 3:
 				return True
@@ -379,6 +403,7 @@ class ScrapyGanji(ScrapyHouseInfo):
 #sys.setdefaultencoding('utf8')
 Log('Application Start')
 
+causeDic = {SCRAPY_CAUSE_NEW : '新增', SCRAPY_CAUSE_TimeUpdate : '更新', SCRAPY_CAUSE_PriceChange : '价变', SCRAPY_CAUSE_ContentChange : '修改'}
 dbHost = ReadConfig(CONFIG_FIELD_DATABASE, 'host')
 dbPort = int(ReadConfig(CONFIG_FIELD_DATABASE, 'port'))
 dbName = ReadConfig(CONFIG_FIELD_DATABASE, 'dbName')
