@@ -24,7 +24,7 @@
 				<Field Name="layout" DataType="_STRING" MatchGroupIndex="18"/>
 				<Field Name="square" DataType="_STRING" MatchGroupIndex="19"/>				
 			</DataFields>
-			<HtmlTemplate>&lt;p&gt;&lt;a href="$link$"&gt;$title$($source$)&lt;/a&gt;  $productUpdateTimeStr$&lt;br&gt;&lt;font color="red"&gt;$community$  $price$$priceUnit$($square$)&lt;/font&gt;&lt;br&gt;$unitPrice$  $layout$  $publisherType$  $publisherName$  $tag$&lt;/p&gt;</HtmlTemplate>
+			<HtmlTemplate>&lt;p&gt;($scrapyCause$)&lt;a href="$link$"&gt;$title$($source$)&lt;/a&gt;  $productUpdateTimeStr$&lt;br&gt;&lt;font color="red"&gt;$community$  $price$$priceUnit$($square$)&lt;/font&gt;&lt;br&gt;$unitPrice$  $layout$  $publisherType$  $publisherName$  $tag$&lt;/p&gt;</HtmlTemplate>
 			<SummaryTemplate>$productID$-$title$-$publisherName$-$source$-$square$-$publisherType$-$price$-$tag$-$layout$-$unitPrice$-$priceUnit$-$location$-$community$</SummaryTemplate>
 		</PageList>
 		<PageDetail>
@@ -56,7 +56,7 @@
 				<Field Name="productUpdateTimeStr" DataType="_STRING" MatchGroupIndex="14"/>
 				<Field Name="productID" DataType="_STRING" MatchGroupIndex="13"/>
 			</DataFields>
-			<HtmlTemplate>&lt;p&gt;&lt;a href="http://www.shoufc.cn$link$"&gt;$title$  $buildingType$($source$)   $productUpdateTimeStr$&lt;/a&gt;&lt;br&gt;&lt;font color="red"&gt;$floor$/$buildingFloors$  $price$($square$)  $layout$&lt;/font&gt;&lt;br&gt;$decoration$  $unitPrice$/㎡&lt;/p&gt;</HtmlTemplate>
+			<HtmlTemplate>&lt;p&gt;($scrapyCause$)&lt;a href="http://www.shoufc.cn$link$"&gt;$title$  $buildingType$($source$)   $productUpdateTimeStr$&lt;/a&gt;&lt;br&gt;&lt;font color="red"&gt;$floor$/$buildingFloors$  $price$($square$)  $layout$&lt;/font&gt;&lt;br&gt;$decoration$  $unitPrice$/㎡&lt;/p&gt;</HtmlTemplate>
 			<SummaryTemplate>$productID$-$title$-$link$-$pic$-$unitPrice$-$community$-$price$-$decoration$-$layout$-$buildingType$-$floor$-$source$-$square$-$location$-$buildingFloors$</SummaryTemplate>
 		</PageList>
 		<PageDetail>
