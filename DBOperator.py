@@ -1,3 +1,5 @@
+#coding=utf-8
+
 import pymysql.cursors
 
 class DBOperator():
@@ -8,7 +10,7 @@ class DBOperator():
                              user=userName,
                              password=passwd,
                              db=dbName,
-                             charset='utf8mb4',
+                             charset='utf8',
                              cursorclass=pymysql.cursors.DictCursor)
 		self.cursor = self.conn.cursor()
 
@@ -16,6 +18,7 @@ class DBOperator():
 		self.conn.close()
 
 	def Execute(self, sqlStr):
+		#print (sqlStr)
 		row = self.cursor.execute(sqlStr)
 		self.conn.commit()
 		return row

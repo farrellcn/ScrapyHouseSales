@@ -11,22 +11,23 @@ import urllib.request, re, codecs, os, os.path, smtplib, configparser, time, sys
 XML_FILE_NAME = 'ScrapyHouseSales.xml'
 SOURCE_NODE_NAME = 'Source'
 
-PATH_CONFIG = 'config\\'
+PATH_CONFIG = 'config/'
 CONFIG_FILE_NAME = 'config.ini'
 CONFIG_FIELD_EMAIL = 'email'
 CONFIG_FIELD_DATABASE = 'database'
 
-PATH_LOG = 'log\\'
+PATH_LOG = 'log/'
 LOG_FILE_NAME = 'log.txt'
 
 #读ini文件
 def ReadConfig(field, key):
     cf = configparser.ConfigParser()
     try:
-        cf.read(GetConfigPath() + CONFIG_FILE_NAME)
-        result = cf.get(field, key)
+    	cf.read(GetConfigPath() + CONFIG_FILE_NAME)
+    	result = cf.get(field, key)
     except:
-        sys.exit(1)
+    	Log('Read config file wrong: field=%s,key=%s', (field, key))
+    	sys.exit(1)
     return result
 
 #写ini文件
@@ -52,10 +53,12 @@ def GetAbsPath():
 	sys.argv为执行该python脚本时的命令行参数
 	sys.argv[0]为该python脚本的路径
 	'''
+	#return ('/root/GitHub/ScrapyHouseSales/')
+	#print (os.path.dirname('AbsPath=%s'%sys.argv[0]))
 	if len(os.path.dirname(sys.argv[0])) < 1:
 		return ''
 	else:
-		return os.path.dirname(sys.argv[0]) + '\\'
+		return os.path.dirname(sys.argv[0]) + '/'
 
 def GetLogPath():
 	return GetAbsPath() + PATH_LOG
@@ -78,7 +81,7 @@ def AddToDatabase(houseList):
 	keyList = keyList.replace('\'', '')
 	keyList = keyList.replace('(', '')
 	keyList = keyList.replace(')', '')
-	sqlInsert = 'INSERT INTO SecondHand(notify, %s) VALUES(%d, %s)' % (keyList, notify, formatStr)
+	sqlInsert = 'INSERT INTO secondhand(notify, %s) VALUES(%d, %s)' % (keyList, notify, formatStr)
 	records = []
 	
 	for house in houseList:
@@ -116,17 +119,17 @@ class Notify():
 		subject = nowTime + subject
 		message['Subject'] = Header(subject, 'utf-8')
 		try:
-			print ('准备发送邮件To: %s' % self.sendTo)
+			print ('prepare send mail To: %s' % self.sendTo)
 			#print ('smtp: %s port: %s from: %s to: %s password: %s' % (self.smtp, self.port, self.sendFrom, self.sendTo, self.password))
 			smptObj = smtplib.SMTP(self.smtp, self.port)
 			#smptObj.set_debuglevel(1)
 			smptObj.login(self.sendFrom, self.password)
 			smptObj.sendmail(self.sendFrom, [self.sendTo], message.as_string())
 			smptObj.quit()
-			print ('邮件发送成功')
+			print ('send mail success')
 			return True
 		except smtplib.SMTPException:			
-			print ('无法发送邮件')
+			print ('send mail fail')
 			return False
 		return False
 
@@ -237,19 +240,21 @@ class ScrapyHouseInfo():
 		self.hisHouseList = []
 
 	def GetSearchMode(self, sourceName):
-		row = db.Execute('SELECT * FROM SecondHand WHERE Source="%s"' % sourceName)
+		row = db.Execute('SELECT COUNT(*) AS recordCount FROM secondhand WHERE Source="%s"' % sourceName)
 		if row > 0:
-			print ('Increment Scrapy')
-			return PageSearchMode.smAdd
-		else:
-			print ('Collection Scrapy')
-			return PageSearchMode.smInit
+			records = db.GetLastRecords()
+			firshRecord = records[0]
+			if int(firshRecord['recordCount']) > 0:	
+				print ('Increment Scrapy')
+				return PageSearchMode.smAdd
+		print ('Collection Scrapy')
+		return PageSearchMode.smInit
 
 	def SearchHouse(self):
 		if self.pageCount >= self.pageList.maxDeep:
 			return False
 		if self.searchMode == PageSearchMode.smInit:
-			print ('继续抓取')
+			print ('Continue Scrapy')
 			return True
 		if self.currentPageUrl == self.pageList.baseUrl:
 			return True
@@ -290,7 +295,7 @@ class ScrapyHouseInfo():
 				pageContent = pageContent.decode(self.pageList.charset)	
 				matchList = re.findall(self.pageList.regex, pageContent)
 				if len(matchList) < 1:
-					print ('该页面已无房源，搜索截止')
+					print ('There is no house on this page, Stop search')
 					break
 				for match in matchList:
 					house = HouseInfo()
@@ -316,7 +321,8 @@ class ScrapyHouseInfo():
 
 	#是否有新添加的售房信息
 	def IsNewly(self, house):
-		sql = 'SELECT * FROM SecondHand WHERE SummaryText="%s"' % house.data['summaryText']
+		#print (house.data['summaryText'])
+		sql = 'SELECT * FROM secondhand WHERE SummaryText="%s"' % house.data['summaryText']
 		row = db.Execute(sql)
 		if row > 0:
 			return False
@@ -327,7 +333,7 @@ class ScrapyHouseInfo():
 		try:
 			response = urllib.request.urlopen(pageurl)
 		except:
-			print ('无法获取该页面')
+			print ('can''t get page')
 			return ('')
 		return response.read()
 
@@ -363,12 +369,14 @@ class ScrapyShouFC(ScrapyHouseInfo):
 		if IsNum(house.data['floor']):
 			if int(house.data['floor']) < 3:
 				return True
-		Log('floor:%s,summaryText:%s' % (house.data['floor'], house.data['summaryText']))
+		#Log('floor:%s,summaryText:%s' % (house.data['floor'], house.data['summaryText']))
 		return False
 
 class ScrapyGanji(ScrapyHouseInfo):
 	pass
 
+#reload(sys)
+#sys.setdefaultencoding('utf8')
 Log('Application Start')
 
 dbHost = ReadConfig(CONFIG_FIELD_DATABASE, 'host')
@@ -407,7 +415,7 @@ else:
 	satisfiedCount = satisfiedCount + htmlObj.count
 	if satisfiedCount > 0:
 		subject =  '新增房源：%d' % satisfiedCount
-		print (subject)
+		print ('New Add: Count=%d' % satisfiedCount)
 		notifyMgr = Notify()
 		if notifyMgr.Send(subject, mailContent):			
 			Log('Send Email Successful')
@@ -421,3 +429,4 @@ else:
 			AddToDatabase(scrapyShoufc.houseList)
 		if len(scrapy58.houseList) > 0:
 			AddToDatabase(scrapy58.houseList)
+Log('Application closed')
