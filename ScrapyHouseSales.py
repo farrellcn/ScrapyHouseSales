@@ -19,10 +19,12 @@ CONFIG_FIELD_DATABASE = 'database'
 PATH_LOG = 'log/'
 LOG_FILE_NAME = 'log.txt'
 
-SCRAPY_CAUSE_NEW = 'New'
+SCRAPY_CAUSE_New = 'New'
 SCRAPY_CAUSE_TimeUpdate = 'TimeUpdate'
 SCRAPY_CAUSE_PriceChange = 'PriceChange'
 SCRAPY_CAUSE_ContentChange = 'ContentChange'
+SCRAPY_CAUSE_PriceRise = 'PriceRise'
+SCRAPY_CAUSE_PriceReduce = 'PriceReduce'
 
 #读ini文件
 def ReadConfig(field, key):
@@ -47,6 +49,13 @@ def WriteConfig(field, key, value):
     return True
 
 def IsNum(str):	
+	try:
+		float(str)
+		return True
+	except ValueError as e:
+		return False
+
+def IsInt(str):	
 	try:
 		int(str)
 		return True
@@ -232,7 +241,6 @@ class ScrapyHouseInfo():
 			if self.source == sourceNode.getAttribute('Name'):
 				print ('Source = ' + self.source)
 				pageListNode = sourceNode.getElementsByTagName('PageList')[0]
-				print (pageListNode.nodeName)
 				self.pageList = PageListInfo(pageListNode)
 
 	def __init__(self, sourceName):
@@ -335,12 +343,17 @@ class ScrapyHouseInfo():
 			return False
 		row = db.Execute('SELECT * FROM secondhand WHERE ProductID="%s" ORDER BY CreateTime DESC' % house.data['productID'])		
 		if row < 1:
-			house.data['scrapyCause'] = SCRAPY_CAUSE_NEW
+			house.data['scrapyCause'] = SCRAPY_CAUSE_New
 			return True	
 		records = db.GetLastRecords()
 		firshRecord = records[0]
-		if house.data['price'] != firshRecord['Price']:		
+		if house.data['price'] != firshRecord['Price']:
 			house.data['scrapyCause'] = SCRAPY_CAUSE_PriceChange
+			if IsNum(house.data['price']) and IsNum(firshRecord['Price']):
+				if float(house.data['price']) > float(firshRecord['Price']):
+					house.data['scrapyCause'] = SCRAPY_CAUSE_PriceRise
+				elif float(house.data['price']) < float(firshRecord['Price']):
+					house.data['scrapyCause'] = SCRAPY_CAUSE_PriceReduce
 			return True
 		if house.data['summaryText'] != firshRecord['SummaryText']:	
 			house.data['scrapyCause'] = SCRAPY_CAUSE_ContentChange
@@ -390,7 +403,7 @@ class ScrapyShouFC(ScrapyHouseInfo):
 	def NeedNotify(self, house):
 		if not ScrapyHouseInfo.NeedNotify(self, house):
 			return False
-		if IsNum(house.data['floor']):
+		if IsInt(house.data['floor']):
 			if int(house.data['floor']) < 3:
 				return True
 		#Log('floor:%s,summaryText:%s' % (house.data['floor'], house.data['summaryText']))
@@ -403,7 +416,7 @@ class ScrapyGanji(ScrapyHouseInfo):
 #sys.setdefaultencoding('utf8')
 Log('Application Start')
 
-causeDic = {SCRAPY_CAUSE_NEW : '新增', SCRAPY_CAUSE_TimeUpdate : '更新', SCRAPY_CAUSE_PriceChange : '价变', SCRAPY_CAUSE_ContentChange : '修改'}
+causeDic = {SCRAPY_CAUSE_New : '新增', SCRAPY_CAUSE_TimeUpdate : '更新', SCRAPY_CAUSE_PriceChange : '价变', SCRAPY_CAUSE_ContentChange : '修改', SCRAPY_CAUSE_PriceRise : '涨价', SCRAPY_CAUSE_PriceReduce : '降价'}
 dbHost = ReadConfig(CONFIG_FIELD_DATABASE, 'host')
 dbPort = int(ReadConfig(CONFIG_FIELD_DATABASE, 'port'))
 dbName = ReadConfig(CONFIG_FIELD_DATABASE, 'dbName')
@@ -425,7 +438,7 @@ scrapy58.Scrapy()
 Log('Scrapy 58 finish')
 
 houseCount = (len(scrapy58.houseList) + len(scrapyShoufc.houseList))
-Log('Newly Added House: %d' %houseCount)
+Log('Newly Update House: %d' %houseCount)
 if houseCount < 1:
 	print ('No New')
 else:
@@ -440,7 +453,7 @@ else:
 	satisfiedCount = satisfiedCount + htmlObj.count
 	if satisfiedCount > 0:
 		subject =  '新增房源：%d' % satisfiedCount
-		print ('New Add: Count=%d' % satisfiedCount)
+		Log('Newly Satisfied: %d' % satisfiedCount)
 		notifyMgr = Notify()
 		if notifyMgr.Send(subject, mailContent):			
 			Log('Send Email Successful')
