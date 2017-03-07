@@ -331,6 +331,7 @@ class ScrapyHouseInfo():
 					if self.IsNewly(house):					
 						self.houseList.append(house)
 			self.currentPageUrl = self.GetNextPage()
+		Log('Scrapy [%s] finish' % self.source)
 
 	def ProcessSpecField(self, dataDict):
 		dataDict['productUpdateTime'] = dataDict['productUpdateTimeStr']
@@ -414,6 +415,7 @@ class ScrapyGanji(ScrapyHouseInfo):
 
 #reload(sys)
 #sys.setdefaultencoding('utf8')
+Log('=============================')
 Log('Application Start')
 
 causeDic = {SCRAPY_CAUSE_New : '新增', SCRAPY_CAUSE_TimeUpdate : '更新', SCRAPY_CAUSE_PriceChange : '价变', SCRAPY_CAUSE_ContentChange : '修改', SCRAPY_CAUSE_PriceRise : '涨价', SCRAPY_CAUSE_PriceReduce : '降价'}
@@ -429,13 +431,9 @@ scrapyShoufc = ScrapyShouFC('shoufc')
 scrapyShoufc.LoadConfig()
 scrapyShoufc.Scrapy()
 
-Log('Scrapy shoufc finish')
-
 scrapy58 = Scrapy58('58')
 scrapy58.LoadConfig()
 scrapy58.Scrapy()
-
-Log('Scrapy 58 finish')
 
 houseCount = (len(scrapy58.houseList) + len(scrapyShoufc.houseList))
 Log('Newly Update House: %d' %houseCount)
@@ -467,4 +465,4 @@ else:
 			AddToDatabase(scrapyShoufc.houseList)
 		if len(scrapy58.houseList) > 0:
 			AddToDatabase(scrapy58.houseList)
-Log('Application closed')
+Log('Application Closed')
